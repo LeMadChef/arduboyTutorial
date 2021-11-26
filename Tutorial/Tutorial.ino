@@ -12,7 +12,19 @@ void setup() {
 void loop() {
   arduboy.clear();
   arduboy.setCursor(10, 10);
-  counter = counter + 1;
+  
+  if(arduboy.pressed(UP_BUTTON)) {
+    counter = counter + 1;
+  }
+  if(arduboy.pressed(DOWN_BUTTON)) {
+      counter = counter - 1;
+  }
+
+  if(counter == 36) {
+    arduboy.setCursor(30, 30);
+    arduboy.print("Yay!");  
+  }
+  
   arduboy.print(counter);
   arduboy.display();
 }
