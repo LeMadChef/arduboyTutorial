@@ -1,94 +1,50 @@
 #include <Arduboy2.h>
 
 Arduboy2 arduboy;
-int playerwin;
-int attempts;
-int guessednumber;
-int randomnumber;
-int lastguess;
+int playerx = 5;
+int playery = 10;
+
+const unsigned char PROGMEM background[] = {
+  // width, height,
+  8, 8,
+  0x81, 0x00, 0x12, 0x40, 0x04, 0x11, 0x00, 0x04, 
+};
+
+const unsigned char PROGMEM player[] = {
+  // width, height,
+  16, 16,
+  0xfe, 0x01, 0x3d, 0x25, 0x25, 0x3d, 0x01, 0x01, 0xc1, 0x01, 0x3d, 0x25, 0x25, 0x3d, 0x01, 0xfe, 
+  0x7f, 0x80, 0x9c, 0xbc, 0xb0, 0xb0, 0xb2, 0xb2, 0xb3, 0xb0, 0xb0, 0xb0, 0xbc, 0x9c, 0x80, 0x7f, 
+};
 
 void setup() {
   arduboy.begin();
   arduboy.clear();
-  arduboy.initRandomSeed();
-  
-  playerwin = 0;
-  attempts = 0;
-  guessednumber = 0;
-  randomnumber = random(1, 101);
-  lastguess = 0;
 }
 
 void loop() {
   arduboy.clear();
   arduboy.pollButtons();
 
-  // test for winning condition
-  if (playerwin == 0) {
-    // only allow 7 attempts
-    if (attempts == 7) {
-      // lost game
-      arduboy.setCursor(0, 0);
-      arduboy.print("You lost!");
-      arduboy.print("\n");
-      arduboy.print("Correct Number: ");
-      arduboy.print(randomnumber);
-      // reset the game
-      if (arduboy.justPressed(A_BUTTON)) {
-        randomnumber = random(1, 101);
-        attempts = 0;
-        playerwin = 0;
-      }
-    } else {
-      // continue playing game
-      if (arduboy.justPressed(UP_BUTTON)) {
-        guessednumber = guessednumber + 1;
-      }
-      if (arduboy.justPressed(DOWN_BUTTON)) {
-        guessednumber = guessednumber - 1;
-      }
-      if (arduboy.justPressed(A_BUTTON)) {
-        if (guessednumber == randomnumber) {
-          playerwin = 1;
-        } else {
-          attempts = attempts + 1;
-          lastguess = guessednumber;
-        }
-      }
-      
-      arduboy.setCursor(0, 0);
-      arduboy.print("Attempt: ");
-      arduboy.print(attempts);
-      arduboy.print("\n");
-      arduboy.print("Number to guess: ");
-      arduboy.print(guessednumber);
-      arduboy.print("\n");
-      if (attempts == 0) {
-        arduboy.print("Good luck!");
-      } else {
-        arduboy.print(lastguess);
-        if (lastguess > randomnumber) {
-          arduboy.print(" is too high!");
-        }
-        if( lastguess < randomnumber ) {
-          arduboy.print(" is too low!");
-        }
-      }
-    } 
-  } else {
-    // won the game
-    arduboy.setCursor(0, 0);
-    arduboy.print("You won!");
-    arduboy.print("\n");
-    arduboy.print("Correct Number: ");
-    arduboy.print(randomnumber);
-    // reset the game
-    if (arduboy.justPressed(A_BUTTON)) {
-      randomnumber = random(1, 101);
-      attempts = 0;
-      playerwin = 0;
-    }    
+  if (arduboy.justPressed(LEFT_BUTTON)) {
+    playerx = playerx - 1;
+  }
+  if (arduboy.justPressed(RIGHT_BUTTON)) {
+    playerx = playerx + 1;
+  }
+  if (arduboy.justPressed(UP_BUTTON)) {
+    playery = playery - 1;
+  }
+  if (arduboy.justPressed(DOWN_BUTTON)) {
+    playery = playery + 1;
   }
 
+  for (int backgroundx = 0; backgroundx < 128; backgroundx = backgroundx + 8) {
+    for ( int backgroundy = 0; backgroundy < 64; backgroundy = backgroundy + 8) {
+      Sprites::drawOverwrite(backgroundx, backgroundy, background, 0);
+    }
+  }
+
+  Sprites::drawOverwrite(playerx, playery, player, 0);
   arduboy.display();
 }
